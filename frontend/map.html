@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Spots in the Forest</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+        body {
+            margin: 0;
+            position: relative;
+        }
+        .home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        .home a {
+            text-decoration: none;
+            color: #333;
+            font-size: 24px;
+        }
+        .home i:hover {
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <div class="home">
+        <a href="/frontend/home.html">
+          <i class="fas fa-home"></i>
+        </a>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Example fire spots in the north part of Thailand
+        const fireSpots = [
+            { lat: 18.7883, lng: 98.9853, description: 'P1: Fire spot in Chiang Mai' },
+            { lat: 19.9106, lng: 99.8406, description: 'P2: Fire spot in Chiang Rai' },
+            { lat: 19.3014, lng: 97.9675, description: 'P3: Fire spot near Mountainous region' },
+            { lat: 19.3586, lng: 98.4373, description: 'P4: Fire spot in Mae Hong Son' },
+            { lat: 18.2888, lng: 99.4908, description: 'P5: Fire spot near Lamang' }
+        ];
+
+        const map = L.map('map').setView([18.7883, 98.9853], 7); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        fireSpots.forEach(spot => {
+            L.marker([spot.lat, spot.lng])
+                .addTo(map)
+                .bindPopup(`<b>Fire Detected!</b><br>${spot.description}`) 
+                .openPopup();
+        });
+    </script>
+
+</body>
+</html>
