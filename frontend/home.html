@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard with Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -146,15 +148,33 @@
         .customer-growth ul li span {
             font-weight: bold;
         }
+        #map {
+            height: 400px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .map-container {
+            margin-top: 20px;
+        }
+
         .map a {
-            color: white;    
-            text-decoration: none;  
+        color: white;     
+        text-decoration: none;
+        }
+        .robot-info {
+            font-size: 16px;
         }
 
-        .map a:hover {
-            text-decoration: none; 
+        .icon-temperature, .icon-humidity {
+            font-size: 24px;
+            margin-left: 10px;
         }
-
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px;
+        }
+        .leaflet-popup-content {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +186,7 @@
             <ul>
                 <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
                 <li class="map"><i class="fas fa-map"></i><a href="/map"> Map</a></li>
-                <li><i class="fas fa-file-alt"></i> Report</li>
+                <li><i class="fas fa-file-alt"></i><a href="/report"> Report</li>
             </ul>
         </nav>
         <div class="financial">
@@ -193,131 +213,101 @@
         <header>
             <div class="date" id="date-time"></div>
             <div class="user-profile">
-                <img src="image/Big Bite Donuts 2.PNG" alt="Admin Profile" class="profile-pic">
-                <span>Admin</span>
+                <img src="image/Big_Bite_Donuts_2-removebg-preview.png" alt="Admin Profile" class="admin-profile">
             </div>
         </header>
 
-        <section class="dashboard">
-            <div class="card total-sales">
+        <div class="dashboard">
+            <div class="card">
                 <div class="info">
                     <h3>Temperature</h3>
-                    <p id="temperature"></p>
-                    <span>Celsius</span>
+                    <p id="temperature">25°C</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-thermometer-half icon-temperature"></i>
                 </div>
             </div>
-            <div class="card total-orders">
+            <div class="card">
                 <div class="info">
                     <h3>Humidity</h3>
-                    <p id="humidity"></p>
-                    <span>%</span>
+                    <p id="humidity">60%</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-tint icon-humidity"></i>
                 </div>
             </div>
-            <div class="card visitors">
+            <div class="card">
                 <div class="info">
-                    <h3>Air Quality</h3>
-                    <p id="airquality"></p>
-                    <span>µg/m³</span>
+                    <h3>Air Quality (PM2.5)</h3>
+                    <p id="airquality">30 µg/m³</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-smog"></i>
                 </div>
             </div>
-            <div class="card total-products">
+            <div class="card">
                 <div class="info">
-                    <h3>Fire Investigate Point</h3>
-                    <p id="firespot"></p>
-                    <span>Points</span>
+                    <h3>Fire Spots</h3>
+                    <p id="firespot">5</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-fire"></i>
                 </div>
             </div>
+        </div>
+        <section class="map-container">
+            <h4>Robot Location</h4>
+            <div id="map"></div>
         </section>
-
-        <section class="charts">
+        <div class="charts">
             <div class="customer-habits">
-                <h4>PM 2.5</h4>
                 <canvas id="pm25Chart"></canvas>
             </div>
             <div class="product-statistic">
-                <h4>Temperature and Humidity</h4>
                 <canvas id="tempHumidityChart"></canvas>
             </div>
-        </section>
-
-        <section class="customer-growth">
-            <h4>Fire Spot</h4>
-            <ul id="fireSpotList">
-                <li>P1 <span>Fire spot in Chiang Mai</span></li>
-                <li>P2 <span>Fire spot in Chiang Rai</span></li>
-                <li>P3 <span>Fire spot near Mountainous region</span></li>
-                <li>P4 <span>Fire spot in Mae Hong Son</span></li>
-                <li>P5 <span>Fire spot near Lamang</span></li>
-            </ul>
-        </section>
+        </div>
+        
     </main>
 
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = now.toLocaleDateString('en-US', options);
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('date-time').textContent = `${dateStr} ${timeStr}`;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        // Mock data for demonstration
-        const temperature = Math.floor(Math.random() * 35) + '°C';
-        const humidity = Math.floor(Math.random() * 100) + '%';
-        const airQuality = Math.floor(Math.random() * 300) + ' µg/m³';
-        const fireSpot = Math.floor(Math.random() * 10);
-        
-        // Assign values to DOM elements
-        document.getElementById('temperature').textContent = temperature;
-        document.getElementById('humidity').textContent = humidity;
-        document.getElementById('airquality').textContent = airQuality;
-        document.getElementById('firespot').textContent = fireSpot;
-
-        // Initialize Chart.js charts
-        const ctxTempHumidity = document.getElementById('tempHumidityChart').getContext('2d');
-        const ctxPM25 = document.getElementById('pm25Chart').getContext('2d');
-
-        const tempHumidityChart = new Chart(ctxTempHumidity, {
+        // Initialize the map
+        const map = L.map('map').setView([18.8021, 98.9503], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    
+        const locationPinIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
+        });
+    
+        // Initial robot data
+        const robotData = {
+            lat: 18.8021,
+            lng: 98.9503,
+            speed: 12,
+            acceleration: 0.5,
+        };
+    
+        L.marker([robotData.lat, robotData.lng], { icon: locationPinIcon }).addTo(map).bindPopup('Cindy is here!');
+    
+        // Initialize PM2.5 Chart
+        const pm25Chart = new Chart(document.getElementById('pm25Chart'), {
             type: 'line',
             data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [
-                    {
-                        label: 'Temperature (°C)',
-                        data: [22, 24, 25, 23, 26, 28, 29],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        fill: false,
-                    },
-                    {
-                        label: 'Humidity (%)',
-                        data: [50, 55, 60, 65, 70, 75, 80],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        fill: false,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        const pm25Chart = new Chart(ctxPM25, {
-            type: 'bar',
-            data: {
-                labels: ['Location 1', 'Location 2', 'Location 3', 'Location 4', 'Location 5'],
                 datasets: [{
                     label: 'PM 2.5 (µg/m³)',
-                    data: [30, 40, 50, 70, 90],
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                    borderColor: 'rgba(255, 206, 86, 1)',
-                    borderWidth: 1
+                    data: [50, 60, 80, 120, 180, 100],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -328,8 +318,73 @@
                 }
             }
         });
-    </script>
+    
+        // Initialize Temperature and Humidity Chart
+        const tempHumidityChart = new Chart(document.getElementById('tempHumidityChart'), {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'Temperature (°C)',
+                        data: [25, 26, 27, 30, 29, 32],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Humidity (%)',
+                        data: [50, 55, 65, 70, 68, 75],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        function fetchRealTimeData() {
+            const temperature = Math.floor(Math.random() * 35);
+            const humidity = Math.floor(Math.random() * 100);
+            const airQuality = Math.floor(Math.random() * 300);
+            const fireSpot = Math.floor(Math.random() * 10);
+    
+            document.getElementById('temperature').textContent = temperature + '°C';
+            document.getElementById('humidity').textContent = humidity + '%';
+            document.getElementById('airquality').textContent = airQuality + ' µg/m³';
+            document.getElementById('firespot').textContent = fireSpot;
+    
+            pm25Chart.data.datasets[0].data.push(airQuality);
+            pm25Chart.data.labels.push(new Date().toLocaleTimeString());
+            pm25Chart.update();
+    
+            tempHumidityChart.data.datasets[0].data.push(temperature);
+            tempHumidityChart.data.datasets[1].data.push(humidity); 
+            tempHumidityChart.data.labels.push(new Date().toLocaleTimeString());
+            tempHumidityChart.update();
+        }
+
+        setInterval(fetchRealTimeData, 5000);
+    
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', options);
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('date-time').textContent = `${dateStr} ${timeStr}`;
+        }
+        
+        // Update date and time every second
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+    </script>
+    
 </body>
 </html>

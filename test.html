@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Style</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #e0f4f4;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .data {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 150px;
+            width: 100%;
+        }
+
+        .status-good {
+            color: #3cba54;
+            font-weight: bold;
+        }
+
+        .status-moderate {
+            color: #f4c20d;
+            font-weight: bold;
+        }
+
+        .status-unhealthy {
+            color: #db3236;
+            font-weight: bold;
+        }
+
+        /* Filters section */
+        .filter {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px;
+            width: 250px;
+        }
+
+        .filter h4 {
+            margin-bottom: 10px;
+        }
+
+        .filter input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .filter-button {
+            background-color: #3cba54;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .filter-button:hover {
+            background-color: #34a853;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Air Quality Dashboard</h1>
+</header>
+
+<div class="container">
+    <!-- Card 1 -->
+    <div class="card">
+        <h3>Puwokerto Utara</h3>
+        <p class="data">PM2.5: 10.05 µg/m³</p>
+        <p class="data">AQI: <span class="status-good">20 - Very Good</span></p>
+        <div class="chart-container">
+            <canvas id="chart1"></canvas>
+        </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+        <h3>Purwokerto Selatan</h3>
+        <p class="data">PM2.5: 15.28 µg/m³</p>
+        <p class="data">AQI: <span class="status-moderate">58 - Moderate</span></p>
+        <div class="chart-container">
+            <canvas id="chart2"></canvas>
+        </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card">
+        <h3>Jakarta Utara</h3>
+        <p class="data">PM2.5: 22.09 µg/m³</p>
+        <p class="data">AQI: <span class="status-unhealthy">54 - Unhealthy</span></p>
+        <div class="chart-container">
+            <canvas id="chart3"></canvas>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter">
+        <h4>Filter AQI Range</h4>
+        <label for="aqi-min">Min AQI:</label>
+        <input type="number" id="aqi-min" placeholder="Enter min AQI">
+        <label for="aqi-max">Max AQI:</label>
+        <input type="number" id="aqi-max" placeholder="Enter max AQI">
+        <button class="filter-button">Apply Filter</button>
+    </div>
+</div>
+
+<script>
+    // Chart for card 1
+    const ctx1 = document.getElementById('chart1').getContext('2d');
+    const chart1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['04:00', '05:00', '06:00', '07:00', '08:00'],
+            datasets: [{
+                label: 'PM2.5 (µg/m³)',
+                data: [10.05, 10.43, 10.35, 9.90, 10.20],
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Chart for card 2
+    const ctx2 = document.getElementById('chart2').getContext('2d');
+    const chart2 = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['04:00', '05:00', '06:00', '07:00', '08:00'],
+            datasets: [{
+                label: 'PM2.5 (µg/m³)',
+                data: [15.28, 16.00, 15.50, 14.80, 15.30],
+                backgroundColor: 'rgba(244, 194, 13, 0.2)',
+                borderColor: 'rgba(244, 194, 13, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Chart for card 3
+    const ctx3 = document.getElementById('chart3').getContext('2d');
+    const chart3 = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: ['04:00', '05:00', '06:00', '07:00', '08:00'],
+            datasets: [{
+                label: 'PM2.5 (µg/m³)',
+                data: [22.09, 21.90, 22.50, 22.00, 22.30],
+                backgroundColor: 'rgba(219, 50, 54, 0.2)',
+                borderColor: 'rgba(219, 50, 54, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
