@@ -4,24 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fire Detection Robot Report</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
         }
 
         header {
-            color: black;
-            padding: 10px 20px;
+            background-color: #e0f4f4;
+            padding: 20px;
             text-align: center;
+            color: #333;
+            font-size: 1.5rem;
         }
 
+        .container {
+            display: flex;
+            justify-content: space-between; /* Space between cards */
+            margin: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Fixed width for uniformity */
+            margin: 0 10px; /* Add horizontal margin */
+            padding: 20px;
+            text-align: center;
+        }
+        .card p{
+            font-size: 14px;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .data {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 150px;
+            width: 100%;
+        }
+
+        /* Sidebar styling */
         .sidebar {
             position: fixed;
             left: 0;
@@ -33,7 +69,6 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
         .sidebar h2 {
@@ -41,16 +76,12 @@
             margin-bottom: 40px;
         }
 
-        .sidebar nav ul,
-        .financial ul,
-        .tools ul {
+        .sidebar nav ul {
             list-style: none;
             padding-left: 0;
         }
 
-        .sidebar nav ul li,
-        .financial ul li,
-        .tools ul li {
+        .sidebar nav ul li {
             padding: 15px 10px;
             cursor: pointer;
             display: flex;
@@ -59,308 +90,222 @@
             transition: background-color 0.3s;
         }
 
-        .sidebar nav ul li i,
-        .financial ul li i,
-        .tools ul li i {
+        .sidebar nav ul li i {
             margin-right: 10px;
         }
 
         .sidebar nav ul li:hover,
-        .financial ul li:hover,
-        .tools ul li:hover {
-            background-color: #34495e;
-        }
-
         .active {
             background-color: #34495e;
         }
 
-        .upgrade .btn-upgrade {
+        .sidebar .btn-upgrade {
             background-color: #f39c12;
             color: white;
             padding: 10px;
-            width: 100%;
             border-radius: 10px;
-            cursor: pointer;
             text-align: center;
-        }
-
-        .upgrade .btn-upgrade:hover {
-            background-color: #e67e22;
+            margin-top: auto;
+            margin-bottom: 50px;
         }
 
         main {
             padding: 20px;
-            margin-left: 250px; /* Leave space for the sidebar */
+            margin-left: 270px; /* Adjust for the sidebar */
         }
 
-        #report-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .report-card {
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin: 10px;
-            padding: 15px;
-            width: 45%;
-        }
-
-        .report-card h2 {
-            margin: 0 0 10px;
-        }
-
-        .chart-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-
-        .chart {
-            max-width: 100%;
-            margin-top: 15px;
-            width: 100%; /* Adjusted width to 100% */
-        }
-
-        /* Summary Graph Background Box */
         .summary-box {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-            width: 40%; /* Adjust width as needed */
-            float: right; /* Move the summary box to the right */
-        }
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    margin-top: 30px;
+    text-align: center;
+    display: flex;           
+    flex-direction: column;   
+    align-items: center;     
+    margin-left: 50px;
+}
 
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 10px 0;
-            background: #333;
-            color: #fff;
-        }
-        .card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 500px;
-            height: auto;
-            margin: 20px;
-            padding: 20px;
-            text-align: center;
-            margin-right: 50px;
-        }
 
-        .card h3 {
-            color: #333;
-            margin-bottom: 15px;
-        }
+
+ 
     </style>
 </head>
 <body>
-    <main>
-        <div class="container">
-        <section id="report-cards">
-            <div class="container">
-                <div class="card">
-                    <h3>Visit 1</h3>
-                    <p><strong>Date:</strong> 2024-10-01</p>
-                    <p><strong>Time:</strong> 10:00 AM</p>
-                    <p><strong>PM2.5:</strong> 8.00 µg/m³</p>
-                    <p><strong>Temperature:</strong> 29°C</p>
-                    <p><strong>Humidity:</strong> 55%</p>
-                    <p><strong>Fire Spots Found:</strong> 1</p>
-                    <p><strong>Total Distance:</strong> 4 km</p>
-                    <div class="chart-container">
-                        <canvas id="chart1"></canvas>
-                    </div>
-                </div>
-            
-                <div class="card">
-                    <h3>Visit 2</h3>
-                    <p><strong>Date:</strong> 2024-10-02</p>
-                    <p><strong>Time:</strong> 11:00 AM</p>
-                    <p><strong>PM2.5:</strong> 10.05 µg/m³</p>
-                    <p><strong>Temperature:</strong> 30°C</p>
-                    <p><strong>Humidity:</strong> 60%</p>
-                    <p><strong>Fire Spots Found:</strong> 2</p>
-                    <p><strong>Total Distance:</strong> 5 km</p>
-                    <div class="chart-container">
-                        <canvas id="chart2"></canvas>
-                    </div>
-                </div>
-            
-                <div class="card">
-                    <h3>Visit 3</h3>
-                    <p><strong>Date:</strong> 2024-10-03</p>
-                    <p><strong>Time:</strong> 12:00 PM</p>
-                    <p><strong>PM2.5:</strong> 15.00 µg/m³</p>
-                    <p><strong>Temperature:</strong> 28°C</p>
-                    <p><strong>Humidity:</strong> 65%</p>
-                    <p><strong>Fire Spots Found:</strong> 0</p>
-                    <p><strong>Total Distance:</strong> 6 km</p>
-                    <div class="chart-container">
-                        <canvas id="chart3"></canvas>
-                    </div>
-                </div>
+
+<aside class="sidebar">
+    <h2>CINDY</h2>
+    <nav>
+        <ul>
+            <li class="active"><i class="fas fa-chart-line"></i><a href="/home" style="color: white; text-decoration: none;"> Dashboard</a></li>
+            <li><i class="fas fa-map"></i> <a href="/map" style="color: white; text-decoration: none;">Map</a></li>
+            <li><i class="fas fa-file-alt"></i> <a href="/report" style="color: white; text-decoration: none;">Report</a></li>
+        </ul>
+    </nav>
+    <div class="btn-upgrade"><a href="/logout" style="color: white; text-decoration: none;">Log Out</a></div>
+</aside>
+
+<main>
+    <div class="container">
+        <div class="card">
+            <h3>Visit 1</h3>
+            <p class="data"><strong>Date:</strong> 2024-10-01</p>
+            <p class="data"><strong>Time:</strong> 10:00 AM</p>
+            <p class="data"><strong>PM2.5:</strong> 8.00 µg/m³</p>
+            <p class="data"><strong>Temperature:</strong> 29°C</p>
+            <p class="data"><strong>Humidity:</strong> 55%</p>
+            <p class="data"><strong>Fire Spots Found:</strong> 1</p>
+            <p class="data"><strong>Total Distance:</strong> 4 km</p>
+            <div class="chart-container">
+                <canvas id="chart1"></canvas>
             </div>
-            
-            <!-- Add more visit reports as needed -->
-        </section>
+        </div>
 
-        <section id="summary-graph" class="summary-box">
-            <h2>Summary Graph</h2>
-            <canvas id="summaryChart"></canvas>
-        </section>
-    </main>
+        <div class="card">
+            <h3>Visit 2</h3>
+            <p class="data"><strong>Date:</strong> 2024-10-02</p>
+            <p class="data"><strong>Time:</strong> 11:00 AM</p>
+            <p class="data"><strong>PM2.5:</strong> 10.05 µg/m³</p>
+            <p class="data"><strong>Temperature:</strong> 30°C</p>
+            <p class="data"><strong>Humidity:</strong> 60%</p>
+            <p class="data"><strong>Fire Spots Found:</strong> 2</p>
+            <p class="data"><strong>Total Distance:</strong> 5 km</p>
+            <div class="chart-container">
+                <canvas id="chart2"></canvas>
+            </div>
+        </div>
 
-    <aside class="sidebar">
-        <div class="logo">
-            <h2>CINDY</h2>
+        <div class="card">
+            <h3>Visit 3</h3>
+            <p class="data"><strong>Date:</strong> 2024-10-03</p>
+            <p class="data"><strong>Time:</strong> 12:00 PM</p>
+            <p class="data"><strong>PM2.5:</strong> 15.00 µg/m³</p>
+            <p class="data"><strong>Temperature:</strong> 28°C</p>
+            <p class="data"><strong>Humidity:</strong> 65%</p>
+            <p class="data"><strong>Fire Spots Found:</strong> 0</p>
+            <p class="data"><strong>Total Distance:</strong> 6 km</p>
+            <div class="chart-container">
+                <canvas id="chart3"></canvas>
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
-                <li class="map"><i class="fas fa-map"></i><a href="/map"> Map</a></li>
-                <li><i class="fas fa-file-alt"></i><a href="/report"> Report</a></li>
-            </ul>
-        </nav>
-        <div class="financial">
-            <h4>Financial</h4>
-            <ul>
-                <li><i class="fas fa-exchange-alt"></i> Transactions</li>
-                <li><i class="fas fa-file-invoice"></i> Invoices</li>
-            </ul>
-        </div>
-        <div class="tools">
-            <h4>Tools</h4>
-            <ul>
-                <li><i class="fas fa-cogs"></i> Settings</li>
-                <li><i class="fas fa-comments"></i> Feedback</li>
-                <li><i class="fas fa-question-circle"></i> Help</li>
-            </ul>
-        </div>
-        <div class="upgrade">
-            <button class="btn-upgrade"><i class="fas fa-sign-out-alt"></i><a href="/logout" style="color: white;"> Log Out</a></button>
-        </div>
-    </aside>
+    </div>
+    <div class="summary-box">
+        <h2>Summary Graph</h2>
+        <canvas id="summaryChart"></canvas>
+    </div>
+    
+</main>
 
-    <script src="script.js"></script>
-    <script>
-        // Combined Chart for Visit 1 (Temperature, Humidity, PM 2.5)
-        const ctx1 = document.getElementById('chart1').getContext('2d');
-        const chart1 = new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ['Point 1', 'Point 2', 'Point 3'],
-                datasets: [
-                    {
-                        label: 'Temperature (°C)',
-                        data: [30, 31, 29],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: true
-                    },
-                    {
-                        label: 'Humidity (%)',
-                        data: [60, 58, 61],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: true
-                    },
-                    {
-                        label: 'PM 2.5 (µg/m³)',
-                        data: [25, 30, 22],
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        fill: true
-                    }
-                ]
+<script>
+    // Chart for Visit 1
+    const ctx1 = document.getElementById('chart1').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['Point 1', 'Point 2', 'Point 3'],
+            datasets: [
+                { label: 'Temperature (°C)', data: [30, 31, 29], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true },
+                { label: 'Humidity (%)', data: [60, 58, 61], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)', fill: true },
+                { label: 'PM 2.5 (µg/m³)', data: [25, 30, 22], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)', fill: true },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
+        }
+    });
 
-        // Combined Chart for Visit 2 (Temperature, Humidity, PM 2.5)
-        const ctx2 = document.getElementById('chart2').getContext('2d');
-        const chart2 = new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: ['Point 1', 'Point 2', 'Point 3'],
-                datasets: [
-                    {
-                        label: 'Temperature (°C)',
-                        data: [32, 31, 33],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: true
-                    },
-                    {
-                        label: 'Humidity (%)',
-                        data: [55, 54, 56],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: true
-                    },
-                    {
-                        label: 'PM 2.5 (µg/m³)',
-                        data: [30, 32, 28],
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        fill: true
-                    }
-                ]
+    // Chart for Visit 2
+    const ctx2 = document.getElementById('chart2').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['Point 1', 'Point 2', 'Point 3'],
+            datasets: [
+                { label: 'Temperature (°C)', data: [29, 30, 31], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true },
+                { label: 'Humidity (%)', data: [55, 57, 60], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)', fill: true },
+                { label: 'PM 2.5 (µg/m³)', data: [22, 20, 21], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)', fill: true },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
+        }
+    });
 
-        // Summary Chart for Overall Data
-        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
-        const summaryChart = new Chart(summaryCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Visit 1', 'Visit 2'],
-                datasets: [
-                    {
-                        label: 'Max Temperature (°C)',
-                        data: [32, 32],
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)'
-                    },
-                    {
-                        label: 'Max Humidity (%)',
-                        data: [60, 55],
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)'
-                    },
-                    {
-                        label: 'Max PM 2.5 (µg/m³)',
-                        data: [30, 32],
-                        backgroundColor: 'rgba(255, 206, 86, 0.5)'
-                    }
-                ]
+    // Chart for Visit 3
+    const ctx3 = document.getElementById('chart3').getContext('2d');
+    new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: ['Point 1', 'Point 2', 'Point 3'],
+            datasets: [
+                { label: 'Temperature (°C)', data: [28, 29, 27], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true },
+                { label: 'Humidity (%)', data: [65, 63, 62], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)', fill: true },
+                { label: 'PM 2.5 (µg/m³)', data: [21, 19, 22], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)', fill: true },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    </script>
+        }
+    });
+
+    // Summary Chart
+    const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+    new Chart(summaryCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Visit 1', 'Visit 2', 'Visit 3'],
+            datasets: [
+                { label: 'Max Temperature (°C)', data: [30, 31, 29], backgroundColor: 'rgba(255, 99, 132, 0.5)' },
+                { label: 'Max Humidity (%)', data: [60, 61, 65], backgroundColor: 'rgba(54, 162, 235, 0.5)' },
+                { label: 'Max PM 2.5 (µg/m³)', data: [25, 30, 22], backgroundColor: 'rgba(255, 206, 86, 0.5)' },
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>
