@@ -1,86 +1,58 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const session = require('express-session');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
+const PORT = 3000;
 
-// Middleware for parsing body and session management
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: true }));
-app.use(express.static(path.join(__dirname, 'frontend')));
+// Middleware
+app.use(cors()); // Enable CORS for all requests
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(express.static('frontend')); // Serve static files from 'frontend' folder
 
-// Dummy users for login
-const users = [
-    { username: 'admin', password: 'password' },
-];
-
-// Routes
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
-});
-
+// Route to serve home.html
 app.get('/', (req, res) => {
-    res.redirect('/login');
+    res.sendFile(path.join(__dirname, 'frontend', 'home.html'));
 });
 
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
+// Temporary storage for sensor data
+let sensorData = {
+    temperature: null,
+    humidity: null,
+    flameDetected: null,
+    smokeDetected: null,
+};
 
-    if (user) {
-        req.session.user = user;
-        console.log("Session after login:", req.session); // Debug session
-        res.redirect('/home');
-    } else {
-        res.send('Invalid username or password. <a href="/login">Try again</a>');
-    }
+// Endpoint to receive sensor data from the Arduino
+app.post('/sensor-data', (req, res) => {
+    const { temperature, humidity, mq2Value, flameValue } = req.body;
+    sensorData.temperature = temperature;
+    sensorData.humidity = humidity;
+    sensorData.flameDetected = flameValue === "1";
+    sensorData.smokeDetected = mq2Value === "1";
+
+    console.log(`Received sensor data: ${JSON.stringify(sensorData)}`);
+    res.send('Sensor data received');
 });
 
-app.get('/home', (req, res) => {
-    if (req.session.user) {
-        res.sendFile(path.join(__dirname, 'frontend', 'home.html'));
-    } else {
-        res.redirect('/login');
-    }
+// Endpoint to get sensor data
+app.get('/sensor-data', (req, res) => {
+    res.json(sensorData);
 });
 
-app.get('/map', (req, res) => {
-    if (req.session.user) {
-        res.sendFile(path.join(__dirname, 'frontend', 'map.html'));
-    } else {
-        res.redirect('/login');
-    }
+// Endpoint to receive robot start/stop commands
+app.post('/start?', (req, res) => {
+    console.log('Robot started');
+    res.json({ message: 'Robot started' });
 });
 
-app.get('/report', (req, res) => {
-    if (req.session.user) {
-        res.sendFile(path.join(__dirname, 'frontend', 'report.html'));
-    } else {
-        res.redirect('/login');
-    }
+app.post('/stop?', (req, res) => {
+    console.log('Robot stopped');
+    res.json({ message: 'Robot stopped' });
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.redirect('/home');
-        }
-        res.redirect('/login');
-    });
-});
-
-// Route for receiving sensor data
-app.post('/data', (req, res) => {
-    const { temperature, humidity } = req.body;
-    console.log(`Received Temperature: ${temperature}, Humidity: ${humidity}`);
-
-    // Store data logic goes here (e.g., save to a database)
-
-    res.send('Data received');
-});
-
-// Start the server
-app.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000');
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
