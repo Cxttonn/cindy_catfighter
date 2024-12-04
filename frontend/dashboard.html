@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Control Dashboard</title>
+    <title>Styled Robot Control Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,20 +17,24 @@
         body {
             display: flex;
             height: 100vh;
-            background-color: #f4f6f8;
+            background-color: #f5f7fa;
+            color: #2c3e50;
         }
+        /* Sidebar */
         .sidebar {
             width: 250px;
-            background-color: #2c3e50;
-            color: white;
+            background-color: #ffffff;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            border-right: 1px solid #e8e8e8;
         }
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            color: #3498db;
+            font-size: 1.5em;
         }
         .sidebar nav ul {
             list-style: none;
@@ -40,124 +45,141 @@
             display: flex;
             align-items: center;
             border-radius: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
+            margin-bottom: 10px;
+            font-size: 1em;
+            color: #2c3e50;
         }
-        .sidebar nav ul li:hover {
-            background-color: #34495e;
+        .sidebar nav ul li i {
+            margin-right: 10px;
+            font-size: 1.2em;
         }
-        .active {
-            background-color: #34495e;
-        }
-
-        .sidebar .controls {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-        }
-        .sidebar .controls button {
-            width: 80px;
-            height: 80px;
+        .sidebar nav ul li:hover,
+        .sidebar nav ul li.active {
+            background-color: #3498db;
             color: white;
+        }
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 10px;
+        }
+        .controls button {
+            width: 60px;
+            height: 60px;
             border: none;
-            border-radius: 10px;
+            border-radius: 50%;
             cursor: pointer;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            transition: transform 0.2s;
+            font-size: 1.5em;
+            transition: transform 0.2s, box-shadow 0.3s;
         }
-        .sidebar .controls button:hover {
-            transform: scale(1.05);
+        .controls button:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .sidebar .controls button.start {
+        .controls button.start {
             background-color: #28a745;
         }
-        .sidebar .controls button.stop {
+        .controls button.stop {
             background-color: #dc3545;
         }
 
+        /* Main Content */
         .main-content {
             flex-grow: 1;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
         }
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
         }
         .card {
-            background-color: white;
+            background-color: #ffffff;
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .card .info {
+            flex: 1;
         }
         .card .info h3 {
-            font-size: 16px;
-            color: #2c3e50;
+            font-size: 1.2em;
+            color: #7f8c8d;
         }
         .card .info p {
-            font-size: 24px;
+            font-size: 1.5em;
+            color: #2c3e50;
             font-weight: bold;
         }
-        .card .icon i {
-            font-size: 36px;
+        .card .icon {
+            font-size: 2.5em;
             color: #3498db;
         }
+
+        /* Alert */
         .alert {
             color: red;
             font-weight: bold;
             margin-top: 10px;
         }
-        .detected {
-            color: red; /* Change text color to red for detected status */
-            font-weight: bold;
-        }
+
+        /* Charts */
         .charts {
-            display: flex;
-            gap: 20px;
             margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
         .charts .chart {
-            background-color: white;
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 15px;
-            flex: 1;
+            border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+        #map {
+        width: 100%; 
+        height: 300px; 
+        border-radius: 20px; 
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+        margin-top: 20px;
+        overflow: hidden; 
+    }
+    .leaflet-container {
+        border-radius: 20px;
+    }
     </style>
 </head>
 <body>
     <aside class="sidebar">
-        <div class="logo">
+        <div>
             <h2>Cindyy</h2>
+            <nav>
+                <ul>
+                    <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
+                    <li><i class="fas fa-map-marked-alt"></i> <a href="map.html" style="color: inherit; text-decoration: none;">Map</a></li>
+                    <li><i class="fas fa-file-alt"></i> <a href="report.html" style="color: inherit; text-decoration: none;">Report</a></li>
+                    <li><i class="fas fa-file-alt"></i> <a href="#" style="color: inherit; text-decoration: none;">History</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul>
-                <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
-            </ul>
-            <ul>
-                <li class="active"><i class="fas fa-chart-line"></i><a href="map.html"> Map</a></li>
-            </ul>
-            <ul>
-                <li class="active"><i class="fas fa-chart-line"></i> <a href="report.html"> Report</a></li>
-            </ul>
-        </nav>
-
         <div class="controls">
-            <button class="start" onclick="sendRobotCommand('start')">
-                <i class="fas fa-play"></i>
-            </button>
-            <button class="stop" onclick="sendRobotCommand('stop')">
-                <i class="fas fa-stop"></i>
-            </button>
+            <button class="start"><i class="fas fa-play"></i></button>
+            <button class="stop"><i class="fas fa-stop"></i></button>
         </div>
     </aside>
 
@@ -201,8 +223,7 @@
             </div>
         </div>
 
-        <div id="alert" class="alert"></div>
-
+        <div id="map" style="width: 100%; height: 300px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);"></div>
         <div class="charts">
             <div class="chart">
                 <canvas id="temperatureChart"></canvas>
@@ -275,20 +296,16 @@
             document.getElementById('temperature').innerText = `${data.temperature} °C`;
             document.getElementById('humidity').innerText = `${data.humidity} %`;
 
-            // Update flame detection status
             const flameElement = document.getElementById('flame');
             flameElement.innerText = data.flameDetected ? 'Detected' : 'Not Detected';
-            flameElement.className = data.flameDetected ? 'detected' : ''; // Add or remove class based on detection
+            flameElement.className = data.flameDetected ? 'detected' : ''; 
 
-            // Update smoke detection status
             const smokeElement = document.getElementById('smoke');
             smokeElement.innerText = data.smokeDetected ? 'Detected' : 'Not Detected';
-            smokeElement.className = data.smokeDetected ? 'detected' : ''; // Add or remove class based on detection
-
-            // Update chart data
+            smokeElement.className = data.smokeDetected ? 'detected' : '';
             temperatureData.push(data.temperature);
             humidityData.push(data.humidity);
-            labels.push(labels.length + 1); // Increment label for each fetch
+            labels.push(labels.length + 1); 
 
             temperatureChart.update();
             humidityChart.update();
@@ -317,9 +334,36 @@
             console.error('Error sending command:', error);
         });
     }
-
     setInterval(fetchSensorData, 5000);
+
+// Initialize the map centered on Chiang Mai University
+const map = L.map('map').setView([18.796143, 98.952808], 15); // Chiang Mai University coordinates
+
+// Add a sleek tile layer (CartoDB Positron for a clean look)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map);
+
+// Add a marker for the robot location
+const robotMarker = L.marker([18.796143, 98.952808]).addTo(map);
+robotMarker.bindPopup("<b>I'm here!</b>").openPopup();
+
+async function updateRobotLocation() {
+    // Fetch robot location data
+    const response = await fetch('http://172.20.10.2:3000/robot-location');
+    const data = await response.json();
+
+    // Update the marker position and map view
+    const { latitude, longitude } = data;
+    robotMarker.setLatLng([latitude, longitude]).update();
+    map.setView([latitude, longitude], 15);
+}
+
+// Update robot location every 5 seconds
+setInterval(updateRobotLocation, 5000);
+
 </script>
-    </script>
 </body>
 </html>

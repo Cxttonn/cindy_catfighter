@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,6 +24,71 @@
             <p class="signup-link">Don't have an account? <a href="/signup">Sign up here</a></p>
         </form>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Cindy Catfighter</title>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="image/Big Bite Donuts 2.PNG" alt="Website Logo" class="logo">
+        </div>
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="input-group mb-3">
+                <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="input-group mb-3">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <button type="submit" class="login-btn btn btn-primary btn-block">Login</button>
+            <p class="signup-link mt-3">Don't have an account? <a href="/signup">Sign up here</a></p>
+        </form>
+        <div id="message" class="mt-3 text-danger"></div>
+    </div>
+
+    <script>
+        // Handle the login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Login successful!');
+                    localStorage.setItem('token', data.token); // Store token for future use
+                    window.location.href = '/dashboard.html'; // Redirect after login
+                } else {
+                    const errorData = await response.json();
+                    document.getElementById('message').textContent = errorData.message || 'Login failed!';
+                }
+            } catch (error) {
+                document.getElementById('message').textContent = 'An error occurred. Please try again.';
+                console.error('Login error:', error);
+            }
+        });
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
