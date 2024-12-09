@@ -33,7 +33,7 @@
         .sidebar h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #3498db;
+            color: #9d85b6;
             font-size: 1.5em;
         }
         .sidebar nav ul {
@@ -56,7 +56,7 @@
         }
         .sidebar nav ul li:hover,
         .sidebar nav ul li.active {
-            background-color: #3498db;
+            background-color: #9d85b6;
             color: white;
         }
         /* Controls */
@@ -83,10 +83,10 @@
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
         .controls button.start {
-            background-color: #28a745;
+            background-color: lightgreen;
         }
         .controls button.stop {
-            background-color: #dc3545;
+            background-color: lightcoral;
         }
 
         /* Main Content */
@@ -128,7 +128,7 @@
         }
         .card .icon {
             font-size: 2.5em;
-            color: #3498db;
+            color: #9d85b6;
         }
 
         /* Alert */
@@ -162,6 +162,31 @@
     .leaflet-container {
         border-radius: 20px;
     }
+
+    .logout {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .logout-btn {
+        background-color: #e74c3c;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .logout-btn i {
+        margin-right: 5px;
+    }
+
+    .logout-btn:hover {
+        background-color: #c0392b;
+        transform: scale(1.05);
+    }
     </style>
 </head>
 <body>
@@ -169,17 +194,30 @@
         <div>
             <h2>Cindyy</h2>
             <nav>
+                <!-- <ul>
+                    <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
+                    <li><i class="fas fa-map-marked-alt"></i> <a href="map.html" style="color: inherit; text-decoration: none;">Map</a></li>
+                    <li><i class="fas fa-file-alt"></i> <a href="report.html" style="color: inherit; text-decoration: none;">Report</a></li>
+                    <li><i class="fas fa-file-alt"></i> <a href="#" style="color: inherit; text-decoration: none;">History Log</a></li>
+                </ul> -->
                 <ul>
                     <li class="active"><i class="fas fa-chart-line"></i> Dashboard</li>
                     <li><i class="fas fa-map-marked-alt"></i> <a href="map.html" style="color: inherit; text-decoration: none;">Map</a></li>
                     <li><i class="fas fa-file-alt"></i> <a href="report.html" style="color: inherit; text-decoration: none;">Report</a></li>
-                    <li><i class="fas fa-file-alt"></i> <a href="#" style="color: inherit; text-decoration: none;">History</a></li>
+                    <li><i class="fas fa-history"></i> <a href="#" style="color: inherit; text-decoration: none;">History Log</a></li>
+                    <li><i class="fas fa-robot"></i> <a href="robot-control.html" style="color: inherit; text-decoration: none;">Robot Control</a></li>
                 </ul>
+                
             </nav>
         </div>
-        <div class="controls">
+        <!-- <div class="controls">
             <button class="start"><i class="fas fa-play"></i></button>
             <button class="stop"><i class="fas fa-stop"></i></button>
+        </div> -->
+        <div class="logout">
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </aside>
 
@@ -364,6 +402,12 @@ async function updateRobotLocation() {
 // Update robot location every 5 seconds
 setInterval(updateRobotLocation, 5000);
 
+
+function logout() {
+        // Perform logout action (clear tokens, redirect, etc.)
+        alert('Logging out...');
+        window.location.href = 'login.html'; // Replace with your login page URL
+    }
 </script>
 </body>
 </html>
